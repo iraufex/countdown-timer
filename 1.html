@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Countdown Timer</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #timer {
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="timer">Loading...</div>
+    <script>
+        async function fetchServerTime() {
+            // Fetch server time from a public API
+            const response = await fetch("https://worldtimeapi.org/api/timezone/etc/utc");
+            const data = await response.json();
+            return new Date(data.datetime).getTime();
+        }
+
+        async function startCountdown() {
+            // Fetch the current server time
+            const serverTime = await fetchServerTime();
+
+            // Set the countdown end time (5 hours from server time)
+            const endTime = serverTime + 5 * 60 * 60 * 1000;
+
+            function updateTimer() {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+
+                if (distance < 0) {
+                    document.getElementById("timer").innerHTML = "TIME'S UP!";
+                    clearInterval(timerInterval);
+                    return;
+                }
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("timer").innerHTML = `${hours}:${minutes}:${seconds}`;
+            }
+
+            // Update the timer every second
+            const timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+
+        startCountdown();
+    </script>
+</body>
+</html>
